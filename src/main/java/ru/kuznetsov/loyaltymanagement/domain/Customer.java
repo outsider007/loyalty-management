@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -23,8 +25,14 @@ public class Customer {
     private String middleName;
     @Column(name = "last_name")
     private String lastName;
+    @Column(name = "gender")
+    private String gender;
     @Column(name = "birthday")
-    private Date birthday;
+    private LocalDate birthday;
     @Column(name = "registered_date")
-    private Date registeredDate;
+    private LocalDate registeredDate;
+
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "customer_id")
+    private Balance balance;
 }
