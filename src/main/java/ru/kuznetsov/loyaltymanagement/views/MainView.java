@@ -9,27 +9,35 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.kuznetsov.loyaltymanagement.domain.Customer;
 import ru.kuznetsov.loyaltymanagement.repositories.CustomerRepository;
 
 @Route
 public class MainView extends VerticalLayout {
 
-    private final CustomerRepository repo;
-    private final CustomerEditor editor;
-    private final Button addNewBtn;
+    private CustomerRepository customerRepository;
+    private CustomerEditor editor;
+    private final Button addNew;
+    private final Button editCustomer;
+    private final Button checkBalance;
+    private final Button deleteCustomer;
 
-    final Grid<Customer> grid;
-    final TextField filter;
+    private final Grid<Customer> grid;
+    private final TextField filter;
 
-    public MainView(CustomerRepository repo, CustomerEditor editor) {
-        this.repo = repo;
+    @Autowired
+    public MainView(CustomerRepository customerRepository, CustomerEditor editor) {
+        this.customerRepository = customerRepository;
         this.editor = editor;
         this.grid = new Grid<>(Customer.class);
         this.filter = new TextField();
-        this.addNewBtn = new Button("Новый покупатель", VaadinIcon.PLUS.create());
+        this.addNew = new Button("Новый покупатель", VaadinIcon.PLUS.create());
+        this.editCustomer = new Button("Редактировать", VaadinIcon.EDIT.create());
+        this.checkBalance = new Button("Просмотр баланса", VaadinIcon.CASH.create());
+        this.deleteCustomer = new Button("Удалить", VaadinIcon.TRASH.create());
 
-        HorizontalLayout actions = new HorizontalLayout(filter, addNewBtn);
+        HorizontalLayout actions = new HorizontalLayout(filter, addNew, editCustomer, deleteCustomer, checkBalance);
         add(actions, grid, editor);
 
         initElements();
@@ -44,30 +52,31 @@ public class MainView extends VerticalLayout {
 
     private void initGrid() {
         grid.setHeight("300px");
-        grid.setColumns("id", "firstName", "middleName", "lastName", "gender", "birthday", "registeredDate", "balance.balance");
-        grid.getColumnByKey("id").setWidth("50px").setFlexGrow(0);
+        grid.setColumns("id", "firstName", "middleName", "lastName", "gender", "birthday", "registeredDate");
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
     }
 
     private void initFilter() {
-        filter.setPlaceholder("Фильтрация по имени");
+        filter.setWidth("300px");
+        filter.setPlaceholder("Фильтрация по фамилии");
         filter.setValueChangeMode(ValueChangeMode.EAGER);
     }
 
     private void initListeners() {
         filter.addValueChangeListener(e -> listCustomers(e.getValue()));
-        grid.asSingleSelect().addValueChangeListener(e -> editor.editCustomer(e.getValue()));
-        addNewBtn.addClickListener(e -> editor.editCustomer(new Customer()));
+        addNew.addClickListener(e -> editor.editCustomer(new Customer()));
         editor.setChangeHandler(() -> {
             editor.setVisible(false);
             listCustomers(filter.getValue());
         });
+        editCustomer.addClickListener(e -> editor.editCustomer(grid.getSelectedItems().stream().iterator().next()));
     }
 
     private void listCustomers(String filterText) {
         if (StringUtils.isBlank(filterText)) {
-            grid.setItems(repo.findAll());
+            grid.setItems(customerRepository.findAll());
         } else {
-            grid.setItems(repo.findByFirstNameStartsWithIgnoreCase(filterText));
+            grid.setItems(customerRepository.findByFirstNameStartsWithIgnoreCase(filterText));
         }
     }
 
