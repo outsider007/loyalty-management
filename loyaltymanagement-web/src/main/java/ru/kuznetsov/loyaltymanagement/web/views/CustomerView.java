@@ -27,11 +27,11 @@ import java.util.NoSuchElementException;
 @UIScope
 public class CustomerView extends VerticalLayout {
 
-    private CustomerRepository customerRepository;
-    private BalanceRepository balanceRepository;
-    private CustomerEditView customerEditView;
-    private BalanceChangeView balanceChangeView;
-    private BalanceChangeRepository balanceChangeRepository;
+    private final CustomerRepository customerRepository;
+    private final BalanceRepository balanceRepository;
+    private final CustomerEditView customerEditView;
+    private final BalanceChangeView balanceChangeView;
+    private final BalanceChangeRepository balanceChangeRepository;
     private final Button addNew;
     private final Button editCustomer;
     private final Checkbox checkBalance;
@@ -40,8 +40,6 @@ public class CustomerView extends VerticalLayout {
     private final Grid<Customer> customerGrid;
     private final Grid<Balance> balanceGrid;
     private final TextField filter;
-    private final HorizontalLayout customersList;
-    private final H4 customerListLabel;
     private final H4 balanceLabel;
 
     @Autowired
@@ -60,8 +58,8 @@ public class CustomerView extends VerticalLayout {
         this.checkBalance = new Checkbox("Показывать информацию о балансе");
         this.deleteCustomer = new Button("Удалить", VaadinIcon.TRASH.create());
         this.showBalanceChange = new Button("История изменения баланса", VaadinIcon.CASH.create());
-        this.customersList = new HorizontalLayout(filter, addNew, editCustomer, deleteCustomer, showBalanceChange);
-        this.customerListLabel = new H4("Список покупателей");
+        HorizontalLayout customersList = new HorizontalLayout(filter, addNew, editCustomer, deleteCustomer, showBalanceChange);
+        H4 customerListLabel = new H4("Список покупателей");
         this.balanceLabel = new H4("Баланс покупателя");
         customerEditView.setCustomerGrid(customerGrid);
 
@@ -150,14 +148,14 @@ public class CustomerView extends VerticalLayout {
     }
 
     private void editCustomer(Customer customer) {
-        if (!isSelectCustomer(customer)) {
+        if (isSelectCustomer(customer)) {
             return;
         }
         customerEditView.editCustomer(customer);
     }
 
     private void deleteCustomer(Customer customer) {
-        if (!isSelectCustomer(customer)) {
+        if (isSelectCustomer(customer)) {
             return;
         }
         customerRepository.delete(customer);
@@ -181,12 +179,12 @@ public class CustomerView extends VerticalLayout {
     }
 
     private boolean isSelectCustomer(Customer customer) {
-        if (customer == null) {
+        if (customer != null) {
             Notification.show("Ни один элемент не выбран!",
                     3000, Notification.Position.TOP_STRETCH);
-            return false;
-        } else {
             return true;
+        } else {
+            return false;
         }
     }
 
