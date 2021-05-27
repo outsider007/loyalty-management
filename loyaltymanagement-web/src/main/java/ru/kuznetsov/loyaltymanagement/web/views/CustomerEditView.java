@@ -63,8 +63,8 @@ public class CustomerEditView extends Dialog implements KeyNotifier {
         this.binder = new Binder<>(Customer.class);
         this.mainLayout = new VerticalLayout(firstName, middleName, lastName, gender, birthday, actions);
 
-        setVisible(false);
         add(mainLayout);
+        setVisible(false);
         initElements();
         setCloseOnOutsideClick(false);
     }

@@ -16,9 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.kuznetsov.loyaltymanagement.web.domain.Balance;
 import ru.kuznetsov.loyaltymanagement.web.domain.Customer;
+import ru.kuznetsov.loyaltymanagement.web.repositories.BalanceChangeRepository;
 import ru.kuznetsov.loyaltymanagement.web.repositories.BalanceRepository;
 import ru.kuznetsov.loyaltymanagement.web.repositories.CustomerRepository;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @SpringComponent
@@ -27,11 +29,14 @@ public class CustomerView extends VerticalLayout {
 
     private CustomerRepository customerRepository;
     private BalanceRepository balanceRepository;
-    private CustomerEditView editor;
+    private CustomerEditView customerEditView;
+    private BalanceChangeView balanceChangeView;
+    private BalanceChangeRepository balanceChangeRepository;
     private final Button addNew;
     private final Button editCustomer;
     private final Checkbox checkBalance;
     private final Button deleteCustomer;
+    private final Button showBalanceChange;
     private final Grid<Customer> customerGrid;
     private final Grid<Balance> balanceGrid;
     private final TextField filter;
@@ -40,9 +45,12 @@ public class CustomerView extends VerticalLayout {
     private final H4 balanceLabel;
 
     @Autowired
-    public CustomerView(CustomerRepository customerRepository, CustomerEditView editor, BalanceRepository balanceRepository) {
+    public CustomerView(CustomerRepository customerRepository, CustomerEditView customerEditView, BalanceRepository balanceRepository,
+                        BalanceChangeView balanceChangeView, BalanceChangeRepository balanceChangeRepository) {
+        this.balanceChangeRepository = balanceChangeRepository;
         this.customerRepository = customerRepository;
-        this.editor = editor;
+        this.balanceChangeView = balanceChangeView;
+        this.customerEditView = customerEditView;
         this.balanceRepository = balanceRepository;
         this.customerGrid = new Grid<>(Customer.class);
         this.balanceGrid = new Grid<>(Balance.class);
@@ -51,14 +59,15 @@ public class CustomerView extends VerticalLayout {
         this.editCustomer = new Button("Редактировать", VaadinIcon.EDIT.create());
         this.checkBalance = new Checkbox("Показывать информацию о балансе");
         this.deleteCustomer = new Button("Удалить", VaadinIcon.TRASH.create());
-        this.customersList = new HorizontalLayout(filter, addNew, editCustomer, deleteCustomer);
+        this.showBalanceChange = new Button("История изменения баланса", VaadinIcon.CASH.create());
+        this.customersList = new HorizontalLayout(filter, addNew, editCustomer, deleteCustomer, showBalanceChange);
         this.customerListLabel = new H4("Список покупателей");
         this.balanceLabel = new H4("Баланс покупателя");
-        editor.setCustomerGrid(customerGrid);
+        customerEditView.setCustomerGrid(customerGrid);
 
         initElements();
         listCustomers(null);
-        add(customersList, checkBalance, customerListLabel, customerGrid, balanceLabel, balanceGrid, editor);
+        add(customersList, checkBalance, customerListLabel, customerGrid, balanceLabel, balanceGrid, customerEditView, balanceChangeView);
     }
 
     private void initElements() {
@@ -79,8 +88,7 @@ public class CustomerView extends VerticalLayout {
         balanceGrid.setWidth("600px");
         balanceGrid.setColumns("id", "balance");
         balanceGrid.getColumnByKey("balance").setAutoWidth(true);
-        balanceGrid.setVisible(false);
-        balanceLabel.setVisible(false);
+        checkBalance.setValue(true);
     }
 
     private void initFilter() {
@@ -90,16 +98,35 @@ public class CustomerView extends VerticalLayout {
     }
 
     private void initListeners() {
-        filter.addValueChangeListener(e -> listCustomers(e.getValue()));
-        addNew.addClickListener(e -> editor.editCustomer(new Customer()));
-        editCustomer.addClickListener(e -> editCustomer(customerGrid.getSelectedItems().stream().iterator().next()));
-        deleteCustomer.addClickListener(e -> deleteCustomer(customerGrid.getSelectedItems().stream().iterator().next()));
-        customerGrid.asSingleSelect().addValueChangeListener(e -> {
-            if (e.getValue() != null) {
-                showCustomerBalance(e.getValue().getId());
-            }
-        });
-        checkBalance.addValueChangeListener(e -> setVisibleBalanceGrid(e.getValue()));
+        try {
+            filter.addValueChangeListener(e -> listCustomers(e.getValue()));
+            addNew.addClickListener(e -> customerEditView.editCustomer(new Customer()));
+            editCustomer.addClickListener(e -> editCustomer(customerGrid.getSelectedItems().stream().iterator().next()));
+            deleteCustomer.addClickListener(e -> deleteCustomer(customerGrid.getSelectedItems().stream().iterator().next()));
+            customerGrid.asSingleSelect().addValueChangeListener(e -> {
+                if (e.getValue() != null) {
+                    showCustomerBalance(e.getValue().getId());
+                }
+            });
+            checkBalance.addValueChangeListener(e -> setVisibleBalanceGrid(e.getValue()));
+            showBalanceChange.addClickListener(e -> {
+                if (!customerGrid.getSelectedItems().isEmpty() && customerGrid.getSelectedItems().stream().iterator().next() != null) {
+                    Integer customerId = customerGrid.getSelectedItems().stream().iterator().next().getId();
+                    try {
+                        List<Balance> balanceByCustomerId = balanceRepository.findByCustomerId(customerId);
+                        balanceChangeView.setBalanceId(balanceByCustomerId.stream().iterator().next().getId());
+                        balanceChangeView.open();
+                        balanceChangeView.setVisible(true);
+                    } catch (NoSuchElementException ex) {
+                        Notification.show("Не найден баланс покупателя с id " + customerId, 3000, Notification.Position.TOP_STRETCH);
+                        balanceChangeView.close();
+                        balanceChangeView.setVisible(false);
+                    }
+                }
+            });
+        } catch (NoSuchElementException exception) {
+            // FIXME Игнорируем ошибки, которые возникают при инициализации листнеров в тот момент, когда списки пусты
+        }
     }
 
     private void setVisibleBalanceGrid(boolean isVisible) {
@@ -126,7 +153,7 @@ public class CustomerView extends VerticalLayout {
         if (!isSelectCustomer(customer)) {
             return;
         }
-        editor.editCustomer(customer);
+        customerEditView.editCustomer(customer);
     }
 
     private void deleteCustomer(Customer customer) {
@@ -135,6 +162,12 @@ public class CustomerView extends VerticalLayout {
         }
         customerRepository.delete(customer);
         balanceRepository.deleteByCustomerId(customer.getId());
+
+        List<Balance> balances = balanceRepository.findByCustomerId(customer.getId());
+        if (!balances.isEmpty() && balances.get(0) != null) {
+            balanceChangeRepository.deleteByBalanceId(balances.get(0).getId());
+        }
+
         customerGrid.getDataProvider().refreshAll();
         customerGrid.setItems(customerRepository.findAll());
     }
