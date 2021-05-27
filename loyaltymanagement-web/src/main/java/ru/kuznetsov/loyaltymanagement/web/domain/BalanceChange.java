@@ -19,11 +19,13 @@ public class BalanceChange {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name = "balance_id")
-    private String balanceId;
+    private Integer balanceId;
     @Column(name = "operation_type_id")
     private Integer operationTypeId;
-    @Column(name = "sum")
-    private BigInteger sum;
+    @Column(name = "sum_change")
+    private BigInteger sumChange;
+    @Column(name = "total_sum")
+    private BigInteger totalSum;
     @Column(name = "date_change")
     private Date dateChange;
 }
