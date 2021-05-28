@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/service")
-public class ServicesController {
+public class BalanceController {
     @Autowired
     private BalanceRepository balanceRepository;
     @Autowired
@@ -53,7 +53,7 @@ public class ServicesController {
 
     @RequestMapping(value = "/balance/{customerId}", method = RequestMethod.POST)
     public ResponseTransfer updateBalanceByCustomerId(@PathVariable Integer customerId, @RequestBody BalanceChanger balanceChanger) {
-        if (balanceChanger == null || customerId == null || balanceChanger.getOperationType() == null || balanceChanger.getSumChange() == null) {
+        if (balanceChanger == null || customerId == null || balanceChanger.getOperation() == null || balanceChanger.getSum() == null) {
             return new ResponseTransfer(new ResponseTransfer("Invalid incoming parameters!"));
         }
 
@@ -63,19 +63,19 @@ public class ServicesController {
         }
 
         Balance balance = balanceList.iterator().next();
-        Integer operationType = balanceChanger.getOperationType();
+        Integer operationType = balanceChanger.getOperation();
 
         if (OperationType.SUM.intValue() == operationType.intValue()) {
-            balance.setBalance(balance.getBalance().add(balanceChanger.getSumChange()));
+            balance.setBalance(balance.getBalance().add(balanceChanger.getSum()));
         } else if (OperationType.DIFFERENCE.intValue() == operationType.intValue()) {
-            balance.setBalance(balance.getBalance().subtract(balanceChanger.getSumChange()).intValue() >= 0 ?
-                    balance.getBalance().subtract(balanceChanger.getSumChange()) : new BigInteger("0"));
+            balance.setBalance(balance.getBalance().subtract(balanceChanger.getSum()).intValue() >= 0 ?
+                    balance.getBalance().subtract(balanceChanger.getSum()) : new BigInteger("0"));
         } else {
             return new ResponseTransfer(new ResponseTransfer("Invalid operation type!"));
         }
         balanceRepository.save(balance);
 
-        BalanceChange balanceChange = new BalanceChange(null, balance.getId(), operationType, balanceChanger.getSumChange(),
+        BalanceChange balanceChange = new BalanceChange(null, balance.getId(), operationType, balanceChanger.getSum(),
                 balance.getBalance(), new Date());
         balanceChangeRepository.save(balanceChange);
 

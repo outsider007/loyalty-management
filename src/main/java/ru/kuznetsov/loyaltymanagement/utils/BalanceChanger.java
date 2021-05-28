@@ -10,6 +10,6 @@ import java.math.BigInteger;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BalanceChanger {
-    private BigInteger sumChange;
-    private Integer operationType;
+    private BigInteger sum;
+    private Integer operation;
 }
