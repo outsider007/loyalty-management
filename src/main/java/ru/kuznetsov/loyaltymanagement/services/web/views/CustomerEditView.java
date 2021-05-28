@@ -1,4 +1,4 @@
-package ru.kuznetsov.loyaltymanagement.web.views;
+package ru.kuznetsov.loyaltymanagement.services.web.views;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;

@@ -1,4 +1,4 @@
-package ru.kuznetsov.loyaltymanagement.web.views;
+package ru.kuznetsov.loyaltymanagement.services.web.views;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -67,7 +67,7 @@ public class BalanceChangeView extends Dialog {
         balanceChangeGrid.setHeight("730px");
         mainLayout.setHorizontalComponentAlignment(FlexComponent.Alignment.END, actions);
         mainLayout.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER, header);
-        balanceChangeGrid.addColumn(BalanceChange::getBalanceId).setHeader("id").setId("id");
+        balanceChangeGrid.addColumn(BalanceChange::getId).setHeader("id").setId("id");
         balanceChangeGrid.addColumn(e -> OperationType.OPERATION_TYPES.get(e.getOperationTypeId())).setHeader("operation")
                 .setId("operationType");
         balanceChangeGrid.addColumn(BalanceChange::getSumChange).setHeader("sum change").setId("sumChange");

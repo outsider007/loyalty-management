@@ -1,4 +1,4 @@
-package ru.kuznetsov.loyaltymanagement.web.views;
+package ru.kuznetsov.loyaltymanagement.services.web.views;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -106,7 +106,7 @@ public class CustomerView extends VerticalLayout {
                     showCustomerBalance(e.getValue().getId());
                 }
             });
-            checkBalance.addValueChangeListener(e -> setVisibleBalanceGrid(e.getValue()));
+            checkBalance.addValueChangeListener(e -> setVisibleBalanceElements(e.getValue()));
             showBalanceChange.addClickListener(e -> {
                 if (!customerGrid.getSelectedItems().isEmpty() && customerGrid.getSelectedItems().stream().iterator().next() != null) {
                     Integer customerId = customerGrid.getSelectedItems().stream().iterator().next().getId();
@@ -127,9 +127,10 @@ public class CustomerView extends VerticalLayout {
         }
     }
 
-    private void setVisibleBalanceGrid(boolean isVisible) {
+    private void setVisibleBalanceElements(boolean isVisible) {
         balanceLabel.setVisible(isVisible);
         balanceGrid.setVisible(isVisible);
+        showBalanceChange.setVisible(isVisible);
     }
 
     private void showCustomerBalance(Integer customerId) {
@@ -141,21 +142,20 @@ public class CustomerView extends VerticalLayout {
             return;
         }
 
-
         balanceGrid.setItems(balance);
         balanceGrid.getDataProvider().refreshAll();
         balanceGrid.recalculateColumnWidths();
     }
 
     private void editCustomer(Customer customer) {
-        if (isSelectCustomer(customer)) {
+        if (!isSelectCustomer(customer)) {
             return;
         }
         customerEditView.editCustomer(customer);
     }
 
     private void deleteCustomer(Customer customer) {
-        if (isSelectCustomer(customer)) {
+        if (!isSelectCustomer(customer)) {
             return;
         }
         customerRepository.delete(customer);
@@ -179,12 +179,12 @@ public class CustomerView extends VerticalLayout {
     }
 
     private boolean isSelectCustomer(Customer customer) {
-        if (customer != null) {
+        if (customer == null) {
             Notification.show("Ни один элемент не выбран!",
                     3000, Notification.Position.TOP_STRETCH);
-            return true;
-        } else {
             return false;
+        } else {
+            return true;
         }
     }
 

@@ -1,4 +1,4 @@
-package ru.kuznetsov.loyaltymanagement.rest.controllers;
+package ru.kuznetsov.loyaltymanagement.services.rest.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

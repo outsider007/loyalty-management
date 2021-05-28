@@ -1,13 +1,15 @@
-package ru.kuznetsov.loyaltymanagement.web.views;
+package ru.kuznetsov.loyaltymanagement.services.web.views;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Route
-@Component
+@SpringComponent
+@UIScope
 public class MainView extends AppLayout {
 
     private final VerticalLayout mainLayout;

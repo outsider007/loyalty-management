@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseTransfer {
-    private Object responseObject;
+    private Object response;
 
 }
