@@ -67,12 +67,12 @@ public class BalanceChangeView extends Dialog {
         balanceChangeGrid.setHeight("730px");
         mainLayout.setHorizontalComponentAlignment(FlexComponent.Alignment.END, actions);
         mainLayout.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER, header);
-        balanceChangeGrid.addColumn(BalanceChange::getId).setHeader("id").setId("id");
+        balanceChangeGrid.addColumn(BalanceChange::getId).setHeader("id").setSortable(true).setId("id");
         balanceChangeGrid.addColumn(e -> OperationType.OPERATION_TYPES.get(e.getOperationTypeId())).setHeader("operation")
                 .setId("operationType");
-        balanceChangeGrid.addColumn(BalanceChange::getSumChange).setHeader("sum change").setId("sumChange");
+        balanceChangeGrid.addColumn(BalanceChange::getSumChange).setSortable(true).setHeader("sum change").setId("sumChange");
         balanceChangeGrid.addColumn(BalanceChange::getTotalSum).setHeader("sum total").setId("sumTotal");
-        balanceChangeGrid.addColumn(BalanceChange::getDateChange).setHeader("date change").setId("dateChange");
+        balanceChangeGrid.addColumn(BalanceChange::getDateChange).setSortable(true).setHeader("date change").setId("dateChange");
     }
 
     private void initListeners() {

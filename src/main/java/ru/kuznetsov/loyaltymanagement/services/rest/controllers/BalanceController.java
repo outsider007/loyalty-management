@@ -64,18 +64,22 @@ public class BalanceController {
 
         Balance balance = balanceList.iterator().next();
         Integer operationType = balanceChanger.getOperation();
+        BigInteger oldBalanceValue = balance.getBalance();
+        BigInteger changeSum = new BigInteger("0");
 
         if (OperationType.SUM.intValue() == operationType.intValue()) {
             balance.setBalance(balance.getBalance().add(balanceChanger.getSum()));
+            changeSum = changeSum.add(balanceChanger.getSum());
         } else if (OperationType.DIFFERENCE.intValue() == operationType.intValue()) {
             balance.setBalance(balance.getBalance().subtract(balanceChanger.getSum()).intValue() >= 0 ?
                     balance.getBalance().subtract(balanceChanger.getSum()) : new BigInteger("0"));
+            changeSum = oldBalanceValue.subtract(balance.getBalance());
         } else {
             return new ResponseTransfer(new ResponseTransfer("Invalid operation type!"));
         }
         balanceRepository.save(balance);
 
-        BalanceChange balanceChange = new BalanceChange(null, balance.getId(), operationType, balanceChanger.getSum(),
+        BalanceChange balanceChange = new BalanceChange(null, balance.getId(), operationType, changeSum,
                 balance.getBalance(), new Date());
         balanceChangeRepository.save(balanceChange);
 
