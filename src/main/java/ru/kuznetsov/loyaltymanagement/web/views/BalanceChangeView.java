@@ -13,11 +13,10 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.kuznetsov.loyaltymanagement.utils.OperationType;
 import ru.kuznetsov.loyaltymanagement.dao.domain.BalanceChange;
 import ru.kuznetsov.loyaltymanagement.dao.repositories.BalanceChangeRepository;
 import ru.kuznetsov.loyaltymanagement.dao.repositories.BalanceRepository;
-
+import ru.kuznetsov.loyaltymanagement.utils.OperationType;
 
 import java.util.List;
 
