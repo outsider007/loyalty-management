@@ -19,12 +19,16 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/service")
 public class BalanceController {
+    private final BalanceRepository balanceRepository;
+    private final CustomerRepository customerRepository;
+    private final BalanceChangeRepository balanceChangeRepository;
+
     @Autowired
-    private BalanceRepository balanceRepository;
-    @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private BalanceChangeRepository balanceChangeRepository;
+    public BalanceController(BalanceRepository balanceRepository, CustomerRepository customerRepository, BalanceChangeRepository balanceChangeRepository) {
+        this.balanceRepository = balanceRepository;
+        this.customerRepository = customerRepository;
+        this.balanceChangeRepository = balanceChangeRepository;
+    }
 
     @GetMapping("/customers")
     public ResponseTransfer users() {
@@ -46,12 +50,7 @@ public class BalanceController {
         return new ResponseTransfer(balanceRepository.findByCustomerId(customerId));
     }
 
-    @GetMapping("/customers/{id}")
-    public ResponseTransfer getCustomerByCustomerId(@PathVariable Integer id) {
-        return new ResponseTransfer(customerRepository.findById(id));
-    }
-
-    @RequestMapping(value = "/balance/{customerId}", method = RequestMethod.POST)
+    @PostMapping("/balance/{customerId}")
     public ResponseTransfer updateBalanceByCustomerId(@PathVariable Integer customerId, @RequestBody BalanceChanger balanceChanger) {
         if (balanceChanger == null || customerId == null || balanceChanger.getOperation() == null || balanceChanger.getSum() == null) {
             return new ResponseTransfer(new ResponseTransfer("Invalid incoming parameters!"));
