@@ -28,6 +28,7 @@ create table customers
     last_name       varchar(100) null,
     gender          varchar(100) null,
     birthday        datetime     not null,
+    phone_number    varchar(100) not null,
     registered_date datetime     not null
 )
     comment 'Покупатели';
