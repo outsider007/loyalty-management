@@ -38,6 +38,7 @@ public class CustomerEditView extends Dialog implements KeyNotifier {
     private TextField lastName;
     private RadioButtonGroup<String> gender;
     private DatePicker birthday;
+    private TextField phoneNumber;
     private Button save;
     private Button cancel;
     private Button delete;
@@ -55,13 +56,14 @@ public class CustomerEditView extends Dialog implements KeyNotifier {
         this.middleName = new TextField("Имя");
         this.lastName = new TextField("Отчество");
         this.gender = new RadioButtonGroup<>();
-        this.birthday = new DatePicker();
+        this.birthday = new DatePicker("Дата рождения");
+        this.phoneNumber = new TextField("Телефон");
         this.save = new Button("Сохранить", VaadinIcon.CHECK.create());
         this.cancel = new Button("Отмена");
         this.delete = new Button("Удалить", VaadinIcon.TRASH.create());
         this.actions = new HorizontalLayout(save, cancel);
         this.binder = new Binder<>(Customer.class);
-        this.mainLayout = new VerticalLayout(firstName, middleName, lastName, gender, birthday, actions);
+        this.mainLayout = new VerticalLayout(firstName, middleName, lastName, gender, phoneNumber, birthday, actions);
 
         add(mainLayout);
         setVisible(false);
@@ -97,8 +99,8 @@ public class CustomerEditView extends Dialog implements KeyNotifier {
         gender.setLabel("Пол");
         gender.setItems("Мужской", "Женский");
         gender.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
-        birthday.setLabel("Дата рождения");
         birthday.setRequired(true);
+        phoneNumber.setRequired(true);
         binder.bindInstanceFields(this);
     }
 
@@ -113,12 +115,12 @@ public class CustomerEditView extends Dialog implements KeyNotifier {
     }
 
     private boolean validateFields() {
-        return !firstName.isEmpty() && !birthday.isEmpty();
+        return !firstName.isEmpty() && !birthday.isEmpty() && !phoneNumber.isEmpty();
     }
 
      private void save() {
          if (!validateFields()) {
-            Notification.show("Некорректно заполнены обязательные поля Фамилия и Дата рождения!",
+            Notification.show("Некорректно заполнены обязательные поля Фамилия, Дата рождения, Номер телефона!",
                     3000, Notification.Position.TOP_STRETCH);
             return;
          }

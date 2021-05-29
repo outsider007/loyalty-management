@@ -27,6 +27,8 @@ public class Customer {
     private String gender;
     @Column(name = "birthday")
     private LocalDate birthday;
+    @Column(name = "phone_number")
+    private String phoneNumber;
     @Column(name = "registered_date")
     private LocalDate registeredDate;
 

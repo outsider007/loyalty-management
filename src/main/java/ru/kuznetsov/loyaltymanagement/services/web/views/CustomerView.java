@@ -77,7 +77,7 @@ public class CustomerView extends VerticalLayout {
 
     private void initCustomerGrid() {
         customerGrid.setHeight("550px");
-        customerGrid.setColumns("id", "firstName", "middleName", "lastName", "gender", "birthday", "registeredDate");
+        customerGrid.setColumns("id", "firstName", "middleName", "lastName", "gender", "birthday", "phoneNumber", "registeredDate");
     }
 
     private void initBalanceComponents() {
@@ -90,17 +90,32 @@ public class CustomerView extends VerticalLayout {
     }
 
     private void initFilter() {
-        filter.setWidth("300px");
-        filter.setPlaceholder("Фильтрация по фамилии");
+        filter.setWidth("400px");
+        filter.setPlaceholder("Поиск по номеру фамилии или номеру телефона");
         filter.setValueChangeMode(ValueChangeMode.EAGER);
     }
 
     private void initListeners() {
         try {
+            // FIXME Вынести проверку на выбранность элемента в отдельный метод
             filter.addValueChangeListener(e -> listCustomers(e.getValue()));
             addNew.addClickListener(e -> customerEditView.editCustomer(new Customer()));
-            editCustomer.addClickListener(e -> editCustomer(customerGrid.getSelectedItems().stream().iterator().next()));
-            deleteCustomer.addClickListener(e -> deleteCustomer(customerGrid.getSelectedItems().stream().iterator().next()));
+            editCustomer.addClickListener(e -> {
+                if (!customerGrid.getSelectedItems().isEmpty()) {
+                    editCustomer(customerGrid.getSelectedItems().stream().iterator().next());
+                } else {
+                    Notification.show("Ни один элемент не выбран!",
+                            3000, Notification.Position.TOP_STRETCH);
+                }
+            });
+            deleteCustomer.addClickListener(e -> {
+                if (!customerGrid.getSelectedItems().isEmpty()) {
+                    deleteCustomer(customerGrid.getSelectedItems().stream().iterator().next());
+                } else {
+                    Notification.show("Ни один элемент не выбран!",
+                            3000, Notification.Position.TOP_STRETCH);
+                }
+            });
             customerGrid.asSingleSelect().addValueChangeListener(e -> {
                 if (e.getValue() != null) {
                     showCustomerBalance(e.getValue().getId());
@@ -120,6 +135,9 @@ public class CustomerView extends VerticalLayout {
                         balanceChangeView.close();
                         balanceChangeView.setVisible(false);
                     }
+                } else {
+                    Notification.show("Ни один элемент не выбран!",
+                            3000, Notification.Position.TOP_STRETCH);
                 }
             });
         } catch (NoSuchElementException exception) {
@@ -174,7 +192,7 @@ public class CustomerView extends VerticalLayout {
         if (StringUtils.isBlank(filterText)) {
             customerGrid.setItems(customerRepository.findAll());
         } else {
-            customerGrid.setItems(customerRepository.findByFirstNameStartingWith(filterText));
+            customerGrid.setItems(customerRepository.findByPhoneNumberStartingWithOrFirstNameStartingWith(filterText, filterText));
         }
     }
 
