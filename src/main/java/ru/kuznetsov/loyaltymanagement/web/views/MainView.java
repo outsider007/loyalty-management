@@ -1,4 +1,4 @@
-package ru.kuznetsov.loyaltymanagement.services.web.views;
+package ru.kuznetsov.loyaltymanagement.web.views;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;

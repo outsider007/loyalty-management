@@ -1,4 +1,4 @@
-package ru.kuznetsov.loyaltymanagement.services.web.views;
+package ru.kuznetsov.loyaltymanagement.web.views;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
