@@ -30,11 +30,6 @@ public class BalanceController {
         this.balanceChangeRepository = balanceChangeRepository;
     }
 
-    @GetMapping("/customers")
-    public ResponseTransfer users() {
-        return new ResponseTransfer(customerRepository.findAll());
-    }
-
     @GetMapping("/balance")
     public ResponseTransfer balance() {
         return new ResponseTransfer(balanceRepository.findAll());

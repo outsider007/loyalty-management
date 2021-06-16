@@ -31,8 +31,4 @@ public class Customer {
     private String phoneNumber;
     @Column(name = "registered_date")
     private LocalDate registeredDate;
-
-    @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "customer_id")
-    private Balance balance;
 }

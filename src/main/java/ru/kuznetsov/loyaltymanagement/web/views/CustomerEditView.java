@@ -131,7 +131,7 @@ public class CustomerEditView extends Dialog implements KeyNotifier {
 
         customerRepository.save(customer);
 
-        if (customer.getBalance() == null) {
+        if (balanceRepository.findByCustomerId(customer.getId()).isEmpty()) {
             balanceRepository.save(new Balance(null, customer.getId(), new BigInteger("0")));
         }
 

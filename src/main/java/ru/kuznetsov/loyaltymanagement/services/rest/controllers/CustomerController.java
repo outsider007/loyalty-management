@@ -23,6 +23,11 @@ public class CustomerController {
         this.balanceRepository = balanceRepository;
     }
 
+    @GetMapping
+    public ResponseTransfer users() {
+        return new ResponseTransfer(customerRepository.findAll());
+    }
+
     @GetMapping("/{id}")
     public ResponseTransfer getCustomerByCustomerId(@PathVariable Integer id) {
         return new ResponseTransfer(customerRepository.findById(id));
